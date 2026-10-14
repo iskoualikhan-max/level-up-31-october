@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101412">
+<title>LEVEL UP — 31 OCTOBER</title>
+<style>
+:root {
+  --bg: #101412;
+  --panel: #191f1c;
+  --green: #72e6a0;
+  --text: #f2f6f3;
+  --muted: #a1aaa5;
+  --border: #303b34;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  padding: 22px 16px 40px;
+}
+main { max-width: 700px; margin: auto; }
+header { padding: 16px 0 22px; }
+.eyebrow {
+  color: var(--green);
+  letter-spacing: 3px;
+  font-size: 12px;
+  font-weight: bold;
+}
+h1 { font-size: 32px; margin: 12px 0 8px; }
+h1 span { color: var(--green); }
+.subtitle { color: var(--muted); line-height: 1.6; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  margin: 16px 0;
+}
+.stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.stat {
+  background: #202923;
+  padding: 14px 8px;
+  border-radius: 12px;
+  text-align: center;
+}
+.stat strong { display: block; color: var(--green); font-size: 23px; }
+.stat small { color: var(--muted); font-size: 11px; }
+h2 { font-size: 18px; margin: 0 0 15px; }
+label { display: block; margin: 14px 0 8px; color: var(--muted); font-size: 14px; }
+input, textarea, select {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #101612;
+  color: var(--text);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+}
+.habit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.habit:last-child { border-bottom: 0; }
+.habit input { width: 20px; height: 20px; accent-color: var(--green); }
+.habit span { flex: 1; }
+.habit small { color: var(--muted); }
+button {
+  width: 100%;
+  background: var(--green);
+  color: #102017;
+  border: 0;
+  padding: 14px;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 12px;
+}
+.secondary { background: #29332d; color: var(--text); }
+.progress {
+  height: 8px;
+  background: #303a33;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+#bar { height: 100%; width: 0; background: var(--green); transition: width .2s; }
+footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 25px; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="eyebrow">PERSONAL CHALLENGE · 2026</div>
+  <h1>LEVEL <span>UP</span></h1>
+  <div class="subtitle">31 OCTOBER · Каждый день — шаг вперёд.</div>
+</header>
+
+<section class="card">
+  <h2>Твой прогресс</h2>
+  <div class="stats">
+    <div class="stat"><strong id="percent">0%</strong><small>ВЫПОЛНЕНО</small></div>
+    <div class="stat"><strong id="count">0/6</strong><small>ПРИВЫЧЕК</small></div>
+    <div class="stat"><strong id="streak">0</strong><small>СЕГОДНЯ</small></div>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
+</section>
+
+<section class="card">
+  <h2>Мой день</h2>
+  <label for="day">Дата</label>
+  <input id="day" type="date">
+  <div id="habits">
+    <label class="habit"><input type="checkbox" data-id="sleep"><span>Восстановление и сон</span><small>Приоритет</small></label>
+    <label class="habit"><input type="checkbox" data-id="english"><span>Английский язык</span></label>
+    <label class="habit"><input type="checkbox" data-id="clean"><span>Порядок вокруг себя</span></label>
+    <label class="habit"><input type="checkbox" data-id="food"><span>Питание по плану</span></label>
+    <label class="habit"><input type="checkbox" data-id="money"><span>Без азартных игр</span><small>Важно</small></label>
+    <label class="habit"><input type="checkbox" data-id="plan"><span>План на завтра</span></label>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Здоровье и бюджет</h2>
+  <label for="weight">Вес, кг</label>
+  <input id="weight" type="number" min="1" max="300" step="0.1" placeholder="Например, 53.5">
+  <label for="foodmoney">Расходы на еду, ₸</label>
+  <input id="foodmoney" type="number" min="0" placeholder="Лимит на день — 1500 ₸">
+  <label for="note">Заметка о дне</label>
+  <textarea id="note" rows="3" placeholder="Что получилось? Что улучшить завтра?"></textarea>
+  <button id="save">Сохранить день</button>
+  <button class="secondary" id="export">Экспорт резервной копии</button>
+  <label for="restore">Восстановить резервную копию</label>
+  <input id="restore" type="file" accept=".json,application/json">
+  <p class="subtitle" id="status">Данные пока сохраняются только в этом браузере.</p>
+</section>
+<footer>LEVEL UP · Не идеальность, а постоянство.</footer>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const boxes = [...document.querySelectorAll('[data-id]')];
+const today = new Date();
+const localDate = new Date(today.getTime() - today.getTimezoneOffset()*60000)
+  .toISOString().slice(0,10);
+$('day').value = localDate;
+const key = date => 'levelup-' + date;
+function read(date) {
+  try { return JSON.parse(localStorage.getItem(key(date))) || {}; }
+  catch { return {}; }
+}
+function updateStats() {
+  const done = boxes.filter(b => b.checked).length;
+  $('count').textContent = done + '/' + boxes.length;
+  $('percent').textContent = Math.round(done / boxes.length * 100) + '%';
+  $('streak').textContent = done;
+  $('bar').style.width = done / boxes.length * 100 + '%';
+}
+function loadDay() {
+  const d = read($('day').value);
+  boxes.forEach(b => b.checked = !!d[b.dataset.id]);
+  $('weight').value = d.weight || '';
+  $('foodmoney').value = d.foodmoney || '';
+  $('note').value = d.note || '';
+  updateStats();
+}
+function collect() {
+  const d = {};
+  boxes.forEach(b => d[b.dataset.id] = b.checked);
+  d.weight = $('weight').value;
+  d.foodmoney = $('foodmoney').value;
+  d.note = $('note').value;
+  d.updatedAt = new Date().toISOString();
+  return d;
+}
+$('save').addEventListener('click', () => {
+  localStorage.setItem(key($('day').value), JSON.stringify(collect()));
+  $('status').textContent = 'Сохранено на этом устройстве ✓';
+  updateStats();
+});
+boxes.forEach(b => b.addEventListener('change', updateStats));
+$('day').addEventListener('change', loadDay);
+$('export').addEventListener('click', () => {
+  const all = {};
+  Object.keys(localStorage).filter(k => k.startsWith('levelup-'))
+    .forEach(k => all[k] = JSON.parse(localStorage.getItem(k)));
+  const blob = new Blob([JSON.stringify(all,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'level-up-backup.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+$('restore').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    Object.entries(data).forEach(([k,v]) => {
+      if (k.startsWith('levelup-')) localStorage.setItem(k,JSON.stringify(v));
+    });
+    loadDay();
+    $('status').textContent = 'Резервная копия восстановлена ✓';
+  } catch { $('status').textContent = 'Не удалось прочитать файл копии.'; }
+});
+loadDay();
+</script>
+</body>
+</html>
